@@ -1,0 +1,60 @@
+{
+  "name": "velvet-ai-desktop",
+  "productName": "Velvet AI",
+  "version": "1.0.0",
+  "description": "Velvet AI desktop app (18+)",
+  "author": "Marathon Entertainment",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.marathonentertainment.velvetai",
+    "productName": "Velvet AI",
+    "files": [
+      "main.js",
+      "preload.js",
+      "setup.html",
+      "icon.png"
+    ],
+    "icon": "build/icon.png",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.entertainment"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Velvet AI"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Graphics"
+    },
+    "publish": null
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/only1marathon-sketch/Addult.git"
+  }
+}

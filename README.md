@@ -24,6 +24,27 @@ cd backend && pip install -r requirements.txt && python -m pytest -q tests
 uvicorn app.main:app --reload --port 8080
 ```
 
+## Desktop app (Windows · Mac · Linux)
+
+`desktop/` is an Electron app that opens your platform in its own branded window. Accounts, age
+verification and every safety check still run on your server.
+
+**Get the installers:** on GitHub, open **Actions → Build desktop app → Run workflow**. Optionally
+paste your live site address (https://…) so users connect automatically. When it finishes, download
+the `.exe`, `.dmg` and `.AppImage` from the run's **Artifacts** section. Pushing a tag like
+`desktop-v1.0.1` also triggers a build.
+
+**Run it locally:**
+```bash
+cd desktop && npm install && npm start
+```
+On first launch it asks for the server address (`http://localhost:8080` while testing). You can
+change it later from the menu: **Velvet AI → Change server…**
+
+The builds are unsigned, so Windows SmartScreen and macOS Gatekeeper will warn on first open.
+Buy a code-signing certificate (Windows) and an Apple Developer ID ($99/yr) to remove the warnings.
+Apple's and Microsoft's app stores don't allow explicit apps, so distribute the installers from your own site.
+
 ## Safety layers (all on by default)
 
 | Layer | Where |

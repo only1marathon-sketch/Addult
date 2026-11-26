@@ -298,6 +298,9 @@ $("reportForm").onsubmit = async (e) => {
   } catch (err) { toast(err.message, "error"); }
 };
 
+// After verifying in another window or browser, re-check when the user comes back.
+window.addEventListener("focus", () => { if (token && !$("verify").classList.contains("hidden")) refresh(); });
+
 // ---------- Boot ----------
 renderImages();
 refresh();

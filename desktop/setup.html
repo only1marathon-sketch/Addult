@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:" />
+  <title>Velvet AI · Connect</title>
+  <style>
+    :root { --bg:#0a0607; --text:#fbf3e8; --muted:#b8a795; --dim:#7a6a5b; --line:rgba(255,255,255,.1);
+            --grad:linear-gradient(135deg,#9f1239 0%,#e11d48 55%,#f59e0b 100%); }
+    * { box-sizing:border-box; }
+    html,body { height:100%; margin:0; }
+    body { font-family:"Segoe UI",system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text);
+           display:grid; place-items:center; overflow:hidden; -webkit-font-smoothing:antialiased; }
+    .orb { position:fixed; border-radius:50%; filter:blur(110px); z-index:-1; }
+    .o1 { width:520px; height:520px; background:#9f1239; top:-180px; left:-140px; opacity:.5; }
+    .o2 { width:560px; height:560px; background:#f59e0b; bottom:-240px; right:-180px; opacity:.2; }
+    .card { width:min(460px,92vw); padding:38px 32px; border-radius:20px; text-align:center;
+            background:rgba(30,16,15,.65); border:1px solid var(--line); backdrop-filter:blur(22px);
+            box-shadow:0 24px 60px -20px rgba(0,0,0,.7); }
+    .logo { width:64px; height:64px; margin:0 auto 18px; border-radius:18px; background:var(--grad); position:relative;
+            box-shadow:0 10px 40px -8px rgba(225,29,72,.6); }
+    .logo::after { content:""; position:absolute; inset:19px; border-radius:50%; background:var(--bg); opacity:.85; }
+    h1 { margin:0 0 6px; font-size:26px; letter-spacing:-.02em; }
+    h1 em { font-family:Georgia,serif; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    p { margin:0 0 24px; color:var(--muted); line-height:1.55; font-size:14px; }
+    label { display:block; text-align:left; font-size:12px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    input { width:100%; padding:13px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.16); background:rgba(10,5,5,.6);
+            color:var(--text); font:inherit; font-size:15px; outline:none; margin-bottom:14px; }
+    input:focus { border-color:rgba(225,29,72,.6); box-shadow:0 0 0 4px rgba(225,29,72,.15); }
+    button { width:100%; padding:14px; border:0; border-radius:12px; background:var(--grad); color:#fff; font:inherit; font-weight:700;
+             font-size:15px; cursor:pointer; text-shadow:0 1px 2px rgba(0,0,0,.35); box-shadow:0 10px 40px -8px rgba(225,29,72,.55); }
+    button:disabled { opacity:.6; cursor:wait; }
+    .err { min-height:20px; margin-top:14px; color:#fb7185; font-size:13px; }
+    .hint { margin-top:18px; color:var(--dim); font-size:12px; }
+    code { color:#fcd34d; }
+  </style>
+</head>
+<body>
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <form class="card" id="f">
+    <div class="logo"></div>
+    <h1>Velvet <em>AI</em></h1>
+    <p>Enter your Velvet AI server address to connect. You'll only need to do this once.</p>
+    <label for="url">Server address</label>
+    <input id="url" placeholder="https://yourdomain.com" autofocus spellcheck="false" />
+    <button id="go" type="submit">Connect</button>
+    <div class="err" id="err"></div>
+    <div class="hint">Testing on this computer? Use <code>http://localhost:8080</code></div>
+  </form>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const qErr = new URLSearchParams(location.search).get("error");
+    if (qErr) $("err").textContent = qErr;
+    window.desktop.getServer().then((s) => { if (s) $("url").value = s; });
+    $("f").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      $("go").disabled = true; $("go").textContent = "Connecting…"; $("err").textContent = "";
+      const r = await window.desktop.setServer($("url").value);
+      if (!r.ok) { $("err").textContent = r.error; $("go").disabled = false; $("go").textContent = "Connect"; }
+    });
+  </script>
+</body>
+</html>

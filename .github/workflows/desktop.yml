@@ -1,0 +1,59 @@
+name: Build desktop app
+
+# Run from the Actions tab ("Run workflow"), or push a tag like desktop-v1.0.0
+on:
+  workflow_dispatch:
+    inputs:
+      server_url:
+        description: "Your live server address baked into the app (e.g. https://yourdomain.com). Leave empty to ask on first launch."
+        required: false
+        default: ""
+  push:
+    tags: ["desktop-v*"]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: desktop
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"  # unsigned builds; add signing certs later
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set default server
+        if: ${{ github.event.inputs.server_url != '' }}
+        shell: bash
+        env:
+          SERVER_URL: ${{ github.event.inputs.server_url }}
+        run: |
+          node -e "
+            const fs=require('fs');
+            const url=process.env.SERVER_URL;
+            if(!/^https:\/\/[^\s'\"]+$/.test(url)) { console.error('server_url must start with https://'); process.exit(1); }
+            const f='main.js'; let s=fs.readFileSync(f,'utf8');
+            s=s.replace('process.env.VELVET_SERVER_URL || \"\"', JSON.stringify(url));
+            fs.writeFileSync(f,s);
+          "
+
+      - run: npm install
+
+      - run: npm run dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: velvet-ai-${{ matrix.os }}
+          path: |
+            desktop/dist/*.exe
+            desktop/dist/*.dmg
+            desktop/dist/*.AppImage
+          if-no-files-found: error
