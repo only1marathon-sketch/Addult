@@ -5,7 +5,9 @@ services:
       dockerfile: backend/Dockerfile
     env_file: .env
     ports:
-      - "8080:8080"   # the only public port; put HTTPS (Caddy/Nginx/Cloudflare) in front
+      # Private by default: reachable only from the server itself (use an SSH tunnel to test).
+      # When going live, put HTTPS (Caddy/Nginx/Cloudflare) in front and point it at port 8080.
+      - "127.0.0.1:8080:8080"
     volumes:
       - appdata:/app/data
     depends_on: [image-worker, chat]
@@ -26,7 +28,10 @@ services:
 
   chat:
     image: vllm/vllm-openai:latest
-    command: ["--model", "${CHAT_MODEL:-mistralai/Mistral-7B-Instruct-v0.3}", "--max-model-len", "8192"]
+    # Shares one GPU with the image worker: chat takes ~55% of GPU memory (needs a 48 GB card).
+    # If chat and images each get their own GPU, raise CHAT_GPU_MEM to 0.9.
+    command: ["--model", "${CHAT_MODEL:-mistralai/Mistral-7B-Instruct-v0.3}", "--max-model-len", "8192",
+              "--gpu-memory-utilization", "${CHAT_GPU_MEM:-0.55}"]
     environment:
       HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN:-}
     volumes:
