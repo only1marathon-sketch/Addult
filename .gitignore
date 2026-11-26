@@ -1,0 +1,9 @@
+.env
+data/
+**/data/
+__pycache__/
+*.pyc
+.pytest_cache/
+loras/*.safetensors
+training/dataset/
+training/output/
